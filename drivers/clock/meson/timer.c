@@ -129,7 +129,7 @@ notified(microkit_channel ch)
 {
     if (ch == IRQ_CH) {
         handle_irq(ch);
-        microkit_irq_ack_delayed(ch);
+        microkit_irq_ack(ch);
     } else {
         sddf_dprintf("TIMER DRIVER|LOG: unexpected notification %llu\n", ch);
     }
