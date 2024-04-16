@@ -10,12 +10,11 @@ endif
 
 BUILD_DIR ?= .
 
-CC := clang
+CC := aarch64-none-elf-gcc
 TARGET := aarch64-none-elf
 SDDF := ../../
 
 CFLAGS := \
-	-target $(TARGET) \
 	-mstrict-align \
 	-ffreestanding \
 	-I$(MICROKIT_INCLUDE) \
