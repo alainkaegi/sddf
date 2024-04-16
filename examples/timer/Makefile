@@ -1,3 +1,4 @@
+MICROKIT_SDK=/microkit/release/microkit-sdk-1.2.6
 ifeq ($(strip $(MICROKIT_SDK)),)
 $(error MICROKIT_SDK must be specified)
 endif
@@ -9,8 +10,8 @@ MICROKIT_CONFIG ?= debug
 MICROKIT_BOARD := odroidc4
 CPU := cortex-a55
 
-CC := clang
-LD := ld.lld
+CC := aarch64-none-elf-gcc
+LD := aarch64-none-elf-ld
 MICROKIT_TOOL ?= $(MICROKIT_SDK)/bin/microkit
 
 BOARD_DIR := $(MICROKIT_SDK)/board/$(MICROKIT_BOARD)/$(MICROKIT_CONFIG)
@@ -26,8 +27,7 @@ CFLAGS := -mcpu=$(CPU) \
 		  -O3 \
 		  -Wall -Wno-unused-function -Werror -Wno-unused-command-line-argument \
 		  -I$(BOARD_DIR)/include \
-		  -I$(SDDF)/include \
-		  -target aarch64-none-elf
+		  -I$(SDDF)/include
 LDFLAGS := -L$(BOARD_DIR)/lib
 LIBS := -lmicrokit -Tmicrokit.ld
 
