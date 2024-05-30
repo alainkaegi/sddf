@@ -22,23 +22,21 @@ state_t state;
 
 void receive(void)
 {
+    int err;
     net_buff_desc_t buffer;
 
     for (int j = 0; j < 10; ++j) {
-        // Wait for the queue to become non-empty.
-        while (net_queue_empty_active(&state.tx_queue)) {
-            // nothing
-        }
+        // Dequeue a buffer; repeat until successful.
+        do {
+            err = net_dequeue_active(&state.tx_queue, &buffer);
+        } while (err == -1);
 
-        assert(!net_queue_empty_active(&state.tx_queue));
-
-        int err = net_dequeue_active(&state.tx_queue, &buffer);
-        assert(!err);
-
+        // Extract the data.
         int i = *(int *)(buffer.io_or_offset + tx_buffer_data);
         sddf_dprintf("Received %d\r\n", i);
         buffer.len = 0;
 
+        // Return the buffer to the free queue.  Should succeed.
         err = net_enqueue_free(&state.tx_queue, buffer);
         assert(!err);
     }

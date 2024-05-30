@@ -23,21 +23,19 @@ state_t state;
 
 static void send(int i)
 {
+    int err;
     net_buff_desc_t buffer;
 
-    // Wait for a free buffer to become available.
-    while (net_queue_empty_free(&state.tx_queue)) {
-        // nothing
-    }
+    // Get a free buffer; repeat until successful.
+    do {
+        err = net_dequeue_free(&state.tx_queue, &buffer);
+    } while (err == -1);
 
-    assert(!net_queue_empty_free(&state.tx_queue));
-
-    int err = net_dequeue_free(&state.tx_queue, &buffer);
-    assert(!err);
-
+    // Fill the buffer.
     *(int *)(buffer.io_or_offset + tx_buffer_data) = i;
     buffer.len = sizeof(int);
 
+    // Enqueue the buffer for transmission.  Should succeed.
     err = net_enqueue_active(&state.tx_queue, buffer);
     assert(!err);
 }
