@@ -22,9 +22,9 @@ typedef struct net_buff_desc {
 
 typedef struct net_queue {
     /* index to insert at */
-    uint16_t tail;
+    volatile uint16_t tail;
     /* index to remove from */
-    uint16_t head;
+    volatile uint16_t head;
     /* flag to indicate whether consumer requires signalling */
     uint32_t consumer_signalled;
     /* buffer descripter array */
