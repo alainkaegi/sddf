@@ -230,6 +230,8 @@ static void eth_setup(void)
     uint32_t l = eth_mac->macaddr0lo;
     uint32_t h = eth_mac->macaddr0hi;
 
+    sddf_dprintf("mac addr = %04x%08x\n\r", h & 0xffff, l);
+
     assert((hw_ring_buffer_paddr & 0xFFFFFFFF) == hw_ring_buffer_paddr);
 
     rx.descr = (volatile struct descriptor *)hw_ring_buffer_vaddr;
@@ -259,6 +261,8 @@ static void eth_setup(void)
 
 void init(void)
 {
+    sddf_dprintf("eth: init (6)\r\n");
+
     eth_setup();
 
     net_queue_init(&rx_queue, (net_queue_t *)rx_free, (net_queue_t *)rx_active, RX_QUEUE_SIZE_DRIV);
@@ -282,6 +286,7 @@ void init(void)
 
 void notified(microkit_channel ch)
 {
+    sddf_dprintf("eth: int\r\n");
     switch (ch) {
     case IRQ_CH:
         handle_irq();
