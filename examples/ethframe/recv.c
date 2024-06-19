@@ -81,6 +81,9 @@ void receive(void)
     put_uint(n);
     microkit_dbg_puts(")\r\n");
     if (n == 0) {
+        // Require signaling from the producer
+        net_request_signal_active(&state.rx_queue);
+
         microkit_dbg_puts("Done receiving...\r\n");
         return;
     }
@@ -88,6 +91,9 @@ void receive(void)
     while (1) {
         // Dequeue a buffer; return if unsuccessful.
         if (net_dequeue_active(&state.rx_queue, &buffer) == -1) {
+            // Require signaling from the producer
+            net_request_signal_active(&state.rx_queue);
+
             microkit_dbg_puts("Done receiving...\r\n");
             return;
         }
