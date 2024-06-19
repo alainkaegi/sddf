@@ -98,6 +98,21 @@ void receive(void)
             return;
         }
 
+        // Flush stale cache entries corresponding to the addresses of
+        // the buffer content before reading the content of said
+        // buffer.  It seems that what is needed is just an
+        // "invalidate".  Unfortunately on ARM, user-space code can
+        // only do "clean and invalidate" (i.e., write back dirty
+        // cache lines which would overwrite data written by the DMA
+        // engine).  At this stage, the consumer (this file) is not
+        // modifying data so it should never have any dirty cache line
+        // corresponding to the content of the buffer.  In other
+        // words, for now, "clean" is safe.  The sddf developers
+        // mention other ways to perform this task (see comments in
+        // virt_rx.c), but they found this way to be fastest.
+        cache_clean_and_invalidate(rx_buffer_data_vaddr - rx_buffer_data_paddr + buffer.io_or_offset,
+                                   rx_buffer_data_vaddr - rx_buffer_data_paddr + buffer.io_or_offset + ROUND_UP(buffer.len, 1 << CONFIG_L1_CACHE_LINE_SIZE_BITS));
+
         // Dump the packet
         //dumpp(rx_buffer_data_vaddr + buffer.io_or_offset, buffer.len);
         dumpp(rx_buffer_data_vaddr - rx_buffer_data_paddr + buffer.io_or_offset, buffer.len);
