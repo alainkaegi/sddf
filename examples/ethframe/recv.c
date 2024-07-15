@@ -96,6 +96,8 @@ void receive(void)
             // Require signaling from the producer
             net_request_signal_active(&state.rx_queue);
 
+            microkit_notify(DRIVER_CH);
+
             microkit_dbg_puts("Done receiving...\r\n");
             return;
         }
