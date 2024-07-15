@@ -15,6 +15,8 @@ uintptr_t rx_buffer_data_paddr;
 
 uintptr_t uart_base;
 
+unsigned int pkt_count = 0;
+
 typedef struct state {
     net_queue_handle_t rx_queue;
 } state_t;
@@ -112,6 +114,12 @@ void receive(void)
         // virt_rx.c), but they found this way to be fastest.
         cache_clean_and_invalidate(rx_buffer_data_vaddr - rx_buffer_data_paddr + buffer.io_or_offset,
                                    rx_buffer_data_vaddr - rx_buffer_data_paddr + buffer.io_or_offset + ROUND_UP(buffer.len, 1 << CONFIG_L1_CACHE_LINE_SIZE_BITS));
+
+        // Dump the packet number
+        microkit_dbg_puts("count: ");
+        put_uint(pkt_count);
+        microkit_dbg_puts("\r\n");
+        ++pkt_count;
 
         // Dump the packet
         //dumpp(rx_buffer_data_vaddr + buffer.io_or_offset, buffer.len);
