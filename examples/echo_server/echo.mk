@@ -91,16 +91,11 @@ $(SYSTEM_FILE): $(METAPROGRAM) $(IMAGES) $(DTB)
 	$(OBJCOPY) --update-section .net_virt_rx_config=net_virt_rx.data network_virt_rx.elf
 	$(OBJCOPY) --update-section .net_virt_tx_config=net_virt_tx.data network_virt_tx.elf
 	$(OBJCOPY) --update-section .net_copy_config=net_copy_client0_net_copier.data network_copy.elf network_copy0.elf
-	$(OBJCOPY) --update-section .net_copy_config=net_copy_client1_net_copier.data network_copy.elf network_copy1.elf
 	$(OBJCOPY) --update-section .device_resources=timer_driver_device_resources.data timer_driver.elf
 	$(OBJCOPY) --update-section .timer_client_config=timer_client_client0.data echo0.elf
 	$(OBJCOPY) --update-section .net_client_config=net_client_client0.data echo0.elf
 	$(OBJCOPY) --update-section .serial_client_config=serial_client_client0.data echo0.elf
-	$(OBJCOPY) --update-section .timer_client_config=timer_client_client1.data echo1.elf
-	$(OBJCOPY) --update-section .net_client_config=net_client_client1.data echo1.elf
-	$(OBJCOPY) --update-section .serial_client_config=serial_client_client1.data echo1.elf
 	$(OBJCOPY) --update-section .lib_sddf_lwip_config=lib_sddf_lwip_config_client0.data echo0.elf
-	$(OBJCOPY) --update-section .lib_sddf_lwip_config=lib_sddf_lwip_config_client1.data echo1.elf
 	touch $@
 
 ${IMAGE_FILE} $(REPORT_FILE): $(IMAGES) $(SYSTEM_FILE)
