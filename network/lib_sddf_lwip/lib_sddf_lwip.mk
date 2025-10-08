@@ -44,7 +44,13 @@ LIB_SDDF_LWIP_LWIP_FILES := \
 	$(COREFILES) \
 	$(CORE4FILES) \
 	netif/ethernet.c \
-	api/err.c
+	api/err.c \
+	dep_ethernet.c \
+	dep_queue.c \
+	ndp.c \
+	dep_cache.c \
+	rbtree.c \
+	crc32.c
 
 # Remove LWIPDIR prefix as we prefer the unprefixed form
 LIB_SDDF_LWIP_LWIP_FILES := $(subst $(LWIPDIR)/,,$(LIB_SDDF_LWIP_LWIP_FILES))
