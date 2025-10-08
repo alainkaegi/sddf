@@ -24,6 +24,36 @@
 #include "lwip/timeouts.h"
 #include "lwip/dhcp.h"
 
+#include <stddef.h>
+#include "dep_queue.h"
+#include "inet.h"
+#include "ip_addr.h"
+#include "socket.h"
+#include "sk_buf.h"
+#include "dep_ethernet.h"
+
+// Reserve memory for our sk_bufs
+#define NUM_SK_BUFS 1024
+struct sk_buf sk_bufs[NUM_SK_BUFS];
+struct socket src_sockets[NUM_SK_BUFS];
+struct socket dst_sockets[NUM_SK_BUFS];
+uint8_t sk_bufs_free_queue_memory_region[sizeof(struct dep_queue) + NUM_SK_BUFS * sizeof(struct sk_buf *)];
+struct dep_queue *sk_bufs_free_queue = (struct dep_queue *) sk_bufs_free_queue_memory_region;
+
+// Initializes sk_bufs
+void init_sk_bufs() {
+    for (int i = 0; i < NUM_SK_BUFS; i++) {
+        sk_bufs[i].begin = NULL;
+        sk_bufs[i].end   = NULL;
+        sk_bufs[i].first = NULL;
+        sk_bufs[i].last  = NULL;
+        sk_bufs[i].src   = &src_sockets[i];
+        sk_bufs[i].dst   = &dst_sockets[i];
+        sk_bufs[i].err   = 0;
+        dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) &sk_bufs[i]);
+    }
+}
+
 /* Number of characters needed to store string of longest IPV4 address */
 #define SDDF_LWIP_IPV4_ADDR_STRLEN 16
 
@@ -359,18 +389,31 @@ void sddf_lwip_process_rx(void)
         return;
     }
 
+    lwip_state.err_output("LWIP|STATUS: here\n");
+    lwip_state.err_output("LWIP|STATUS: %d\n", dep_queue_is_empty(sk_bufs_free_queue));
+
     bool reprocess = true;
     while (reprocess) {
-        while (!net_queue_empty_active(&sddf_state.rx_queue) && !pbuf_pool_empty()) {
+        while (!net_queue_empty_active(&sddf_state.rx_queue) && !dep_queue_is_empty(sk_bufs_free_queue)) {
             net_buff_desc_t buffer;
             int err = net_dequeue_active(&sddf_state.rx_queue, &buffer);
             assert(!err);
 
-            struct pbuf *p = create_interface_buffer(buffer.io_or_offset, buffer.len);
-            assert(p != NULL);
-            if (lwip_state.netif.input(p, &lwip_state.netif) != ERR_OK) {
-                lwip_state.err_output("LWIP|ERROR: unknown error inputting pbuf into network stack\n");
-                pbuf_free(p);
+            lwip_state.err_output("LWIP|STATUS: there\n");
+
+            struct sk_buf *skb = (struct sk_buf *) dep_queue_dequeue(sk_bufs_free_queue);
+            assert(skb != NULL);
+            // See create_interface_buffer() for inspiration
+            void *begin = (void *)(sddf_state.rx_buffer_data_region + buffer.io_or_offset);
+            void *end   = begin + buffer.len;
+            skb->begin  = begin;
+            skb->first  = begin;
+            skb->end    = end;
+            skb->last   = end;
+            skb->err    = 0;
+            if (ethernet_unwrap(skb) != ETHERNET_GOOD) {
+                lwip_state.err_output("LWIP|ERROR: error ethernet unwrap\n");
+                dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) skb);
             }
         }
 
