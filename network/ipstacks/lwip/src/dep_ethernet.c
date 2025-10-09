@@ -9,6 +9,8 @@
 #include "sk_buf.h"
 #include "ndp.h"
 
+#include <sddf/util/printf.h>
+
 #include "dep_ethernet.h"
 
 //#include "assert.h"
@@ -41,6 +43,15 @@ static const uint16_t ETHERTYPE_IPV6 = 0x86dd;
         __auto_type _b = (b); \
         _a > _b ? _a : _b;    \
     })
+
+void ethernet_dump(struct ethernet_header *hd) {
+   sddf_printf("ETH|ERROR: %02x:%02x:%02x:%02x:%02x:%02x > %02x:%02x:%02x:%02x:%02x:%02x (%04x)\n",
+               hd->src_addr[0], hd->src_addr[1], hd->src_addr[2],
+               hd->src_addr[3], hd->src_addr[4], hd->src_addr[5],
+               hd->dst_addr[0], hd->dst_addr[1], hd->dst_addr[2],
+               hd->dst_addr[3], hd->dst_addr[4], hd->dst_addr[5],
+               ntoh16(hd->ethertype));
+}
 
 enum inet_status_codes ethernet_wrap(struct sk_buf *skb) {
     // Measure the payload size in bytes.
@@ -122,6 +133,8 @@ enum inet_status_codes ethernet_wrap(struct sk_buf *skb) {
 enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
     struct ethernet_header *hd  = skb->first;
     struct ethernet_trailer *tl = skb->last - sizeof(struct ethernet_trailer);
+
+    ethernet_dump(hd);
 
     // Measure payload length.
     size_t size = (void *) tl - ((void *) hd + sizeof(struct ethernet_header));
