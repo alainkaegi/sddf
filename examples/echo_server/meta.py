@@ -143,7 +143,7 @@ def generate(sdf_file: str, output_dir: str, dtb: DeviceTree):
 
     serial_system.add_client(client0)
     timer_system.add_client(client0)
-    net_system.add_client_with_copier(client0, client0_net_copier)
+    net_system.add_client_with_copier(client0, client0_net_copier, mac_addr="fe:e5:89:b9:7a:9f")
 
     client0_lib_sddf_lwip = Sddf.Lwip(sdf, net_system, client0)
 
