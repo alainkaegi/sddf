@@ -389,17 +389,12 @@ void sddf_lwip_process_rx(void)
         return;
     }
 
-    lwip_state.err_output("LWIP|STATUS: here\n");
-    lwip_state.err_output("LWIP|STATUS: %d\n", dep_queue_is_empty(sk_bufs_free_queue));
-
     bool reprocess = true;
     while (reprocess) {
         while (!net_queue_empty_active(&sddf_state.rx_queue) && !dep_queue_is_empty(sk_bufs_free_queue)) {
             net_buff_desc_t buffer;
             int err = net_dequeue_active(&sddf_state.rx_queue, &buffer);
             assert(!err);
-
-            lwip_state.err_output("LWIP|STATUS: there\n");
 
             struct sk_buf *skb = (struct sk_buf *) dep_queue_dequeue(sk_bufs_free_queue);
             assert(skb != NULL);
