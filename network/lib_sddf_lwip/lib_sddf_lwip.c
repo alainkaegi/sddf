@@ -540,6 +540,7 @@ void sddf_lwip_init(lib_sddf_lwip_config_t *lib_sddf_lwip_config, net_client_con
             lwip_state.err_output("LWIP|ERROR: failed to start DHCP negotiation\n");
         }
     }
+    dep_queue_init(sk_bufs_free_queue, NUM_SK_BUFS);
     init_sk_bufs();
 }
 
