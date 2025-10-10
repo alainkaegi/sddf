@@ -23,7 +23,7 @@
  *        [4]  0000
  *        [5]  8a2e
  *        [6]  0370
- *        7]  7334
+ *        [7]  7334
  *
  * To convert an instance of {@code ip_addr} in network order, one
  * keeps the array order but convert each group to network order.
