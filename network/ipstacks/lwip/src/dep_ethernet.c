@@ -14,7 +14,7 @@
 #include "dep_ethernet.h"
 
 //#include "assert.h"
-#define assert(expr)
+//#define assert(expr) (assert is defined in util.h imported from printf.h)
 //#include "config.h"
 //#include "icmp.h"
 //#include "io.h"
@@ -37,12 +37,15 @@ struct ethernet_trailer {
 
 static const uint16_t ETHERTYPE_IPV6 = 0x86dd;
 
+#if 0
+(defined in util.h imported through printf.h)
 #define MAX(a, b)             \
     ({                        \
         __auto_type _a = (a); \
         __auto_type _b = (b); \
         _a > _b ? _a : _b;    \
     })
+#endif
 
 void ethernet_dump(struct ethernet_header *hd) {
    sddf_printf("ETH|ERROR: %02x:%02x:%02x:%02x:%02x:%02x > %02x:%02x:%02x:%02x:%02x:%02x (%04x)\n",
