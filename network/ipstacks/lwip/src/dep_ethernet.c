@@ -8,6 +8,7 @@
 #include "socket.h"
 #include "sk_buf.h"
 #include "ndp.h"
+#include "dep_ip.h"
 
 #include <sddf/util/printf.h>
 
@@ -161,5 +162,8 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
     skb->first = skb->first + sizeof(struct ethernet_header);
     skb->last  = skb->last - sizeof(struct ethernet_trailer);
 
+    enum inet_status_codes status = ip_unwrap(skb);
+    if (status != IP_GOOD_UDP || status != IP_GOOD_ICMP)
+        return status;
     return ETHERNET_GOOD;
 }
