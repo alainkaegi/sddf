@@ -46,6 +46,7 @@ LIB_SDDF_LWIP_LWIP_FILES := \
 	netif/ethernet.c \
 	api/err.c \
 	dep_ethernet.c \
+	dep_ip.c \
 	dep_queue.c \
 	ndp.c \
 	dep_cache.c \
