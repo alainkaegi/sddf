@@ -10,6 +10,8 @@
 
 #include <sddf/util/printf.h>
 
+#include "dep_udp.h"
+
 //#include "assert.h"
 //#define assert(expr) (assert is defined in util.h imported from printf.h)
 //#include "icmp.h"
@@ -121,7 +123,12 @@ enum inet_status_codes ip_unwrap(struct sk_buf *skb) {
     // Determine what the next header is
     switch (hd->next_header) {
         case IP_PROTO_UDP:
+        {
+            enum inet_status_codes status = udp_unwrap(skb);
+            if (status != UDP_GOOD)
+               return status;
             return IP_GOOD_UDP;
+        }
         case IP_PROTO_ICMP6:
             return IP_GOOD_ICMP;
         default:

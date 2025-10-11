@@ -20,6 +20,11 @@ enum inet_status_codes {
     IP_BAD_DST_ADDR,   ///< Unexpected destination IP address
     IP_BAD_VERSION,    ///< Unexpected IP version
     IP_BAD_NXT_HDR,    ///< Unexpected next header protocol
+    // The UDP processing status codes.
+    UDP_GOOD,         ///< All good
+    UDP_BAD_LENGTH,   ///< Length field disagrees with payload size
+    UDP_BAD_CHECKSUM, ///< Bad checksum
+    UDP_BAD_PORT,     ///< Unexpected destination port
 };
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
