@@ -47,11 +47,13 @@ LIB_SDDF_LWIP_LWIP_FILES := \
 	api/err.c \
 	dep_ethernet.c \
 	dep_ip.c \
+	dep_udp.c \
 	dep_queue.c \
 	ndp.c \
 	dep_cache.c \
 	rbtree.c \
-	crc32.c
+	crc32.c \
+	checksum.c
 
 # Remove LWIPDIR prefix as we prefer the unprefixed form
 LIB_SDDF_LWIP_LWIP_FILES := $(subst $(LWIPDIR)/,,$(LIB_SDDF_LWIP_LWIP_FILES))
