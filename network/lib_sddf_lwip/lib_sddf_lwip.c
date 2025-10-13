@@ -54,6 +54,30 @@ void init_sk_bufs() {
     }
 }
 
+void dump_hex(char *s, size_t n) {
+    int j = 0;
+    // The pointer to the nearest multiple of 16 less or equal to s
+    char *s1 = (char *)((unsigned long)s & ~0xfULL);
+    // Blanks until the first byte of interest
+    sddf_printf("%p", s1);
+    while (s1 != s) {
+        sddf_printf("   ");
+        ++s1;
+        ++j;
+    }
+    // Bytes of interest
+    while (n > 0) {
+        while (n > 0 && j < 16) {
+            sddf_printf(" %02hhx", *s1++);
+            --n;
+            ++j;
+        }
+        sddf_printf("\n%p", s1);
+        j = 0;
+    }
+    sddf_printf("\n");
+}
+
 /* Number of characters needed to store string of longest IPV4 address */
 #define SDDF_LWIP_IPV4_ADDR_STRLEN 16
 
