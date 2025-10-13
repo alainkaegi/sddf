@@ -334,26 +334,10 @@ static struct pbuf *create_interface_buffer(uint64_t offset, size_t length)
  * sddf buffers available, handle_empty_tx_free will be called with the pbuf,
  * and the equivalent lwip error will be returned.
  */
-static err_t lwip_eth_send(struct netif *netif, struct pbuf *p)
+enum inet_status_codes lwip_eth_send(struct sk_buf *skb)
 {
-    if (p->tot_len > NET_BUFFER_SIZE) {
-        lwip_state.err_output("LWIP|ERROR: attempted to send a packet of size %u > BUFFER SIZE %u\n", p->tot_len,
-                              NET_BUFFER_SIZE);
-        return ERR_BUF;
-    }
-
-    /* Allow user to intercept packets before transmission */
-    if (lwip_state.tx_intercept_condition(p)) {
-        return sddf_err_to_lwip_err(lwip_state.tx_handle_intercept(p));
-    }
-
-    /* Client must have TX enabled */
-    if (!sddf_state.tx_queue.capacity) {
-        return ERR_MEM;
-    }
-
     if (net_queue_empty_free(&sddf_state.tx_queue)) {
-        return sddf_err_to_lwip_err(lwip_state.handle_empty_tx_free(p));
+        return QUEUE_EMPTY;
     }
 
     net_buff_desc_t buffer;
@@ -361,25 +345,21 @@ static err_t lwip_eth_send(struct netif *netif, struct pbuf *p)
     assert(!err);
 
     uintptr_t frame = buffer.io_or_offset + sddf_state.tx_buffer_data_region;
-    uint16_t copied = 0;
-    for (struct pbuf *curr = p; curr != NULL; curr = curr->next) {
-        memcpy((void *)(frame + copied), curr->payload, curr->len);
-        copied += curr->len;
-    }
+    memcpy((void *)frame, skb->first, skb->last - skb->first);
 
-    buffer.len = copied;
+    buffer.len = skb->last - skb->first;
     err = net_enqueue_active(&sddf_state.tx_queue, buffer);
     assert(!err);
 
     sddf_state.notify_tx = true;
 
-    return ERR_OK;
+    return ETHERNET_GOOD;
 }
 
 net_sddf_err_t sddf_lwip_transmit_pbuf(struct pbuf *p)
 {
 
-    return lwip_err_to_sddf_err(lwip_eth_send(&lwip_state.netif, p));
+    return lwip_err_to_sddf_err(ERR_MEM);
 }
 
 void sddf_lwip_process_rx(void)
