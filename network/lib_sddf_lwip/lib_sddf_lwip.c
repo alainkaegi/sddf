@@ -368,6 +368,8 @@ enum inet_status_codes lwip_eth_send(struct sk_buf *skb)
         return QUEUE_EMPTY;
     }
 
+    dump_hex(skb->first, skb->last - skb->first);
+
     net_buff_desc_t buffer;
     int err = net_dequeue_free(&sddf_state.tx_queue, &buffer);
     assert(!err);
