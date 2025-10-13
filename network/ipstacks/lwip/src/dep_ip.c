@@ -10,6 +10,7 @@
 
 #include <sddf/util/printf.h>
 
+#include "dep_ethernet.h"
 #include "dep_udp.h"
 
 //#include "assert.h"
