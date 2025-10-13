@@ -6,6 +6,8 @@
 // TBD
 // Brought from ethernet.h, ip.h
 enum inet_status_codes {
+    // Others
+    QUEUE_EMPTY,
     // The Ethernet processing status codes.
     ETHERNET_GOOD,     ///< All good
     ETHERNET_BAD_CRC,  ///< Bad CRC
