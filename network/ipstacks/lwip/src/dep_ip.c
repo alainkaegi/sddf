@@ -10,6 +10,7 @@
 
 #include <sddf/util/printf.h>
 
+#include "dep_ethernet.h"
 #include "dep_udp.h"
 
 //#include "assert.h"
@@ -88,6 +89,9 @@ void ip_wrap(struct sk_buf *skb, uint8_t proto) {
 
     // Adjust the buffer to account for the IP header.
     skb->first = skb->first - sizeof(struct ip_header);
+
+    enum inet_status_codes status = ethernet_wrap(skb);
+    assert(status == ETHERNET_GOOD);
 }
 
 enum inet_status_codes ip_unwrap(struct sk_buf *skb) {

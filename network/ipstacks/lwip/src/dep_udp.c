@@ -30,6 +30,8 @@ struct udp_pseudo_header {
     struct udp_header udp_header;
 };
 
+void echo(struct sk_buf *skb);
+
 void udp_dump(struct udp_pseudo_header *hd) {
   sddf_printf("UDP|ERROR: %hu > %hu, length %hu\n",
               ntoh16(hd->udp_header.src_port), ntoh16(hd->udp_header.dst_port),
@@ -68,6 +70,8 @@ void udp_wrap(struct sk_buf *skb) {
     // Adjust the buffer to account for the UDP header (but not the
     // pseudo header).
     skb->first = skb->first - sizeof(struct udp_header);
+
+    ip_wrap(skb, IP_PROTO_UDP);
 }
 
 enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
@@ -111,7 +115,20 @@ enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
     // Fix the socket buffer.
     skb->first += sizeof(struct udp_header);
 
+    echo(skb);
+
     return UDP_GOOD;
+}
+
+void echo(struct sk_buf *skb) {
+    // Flip the sockets
+    struct socket *tmp = NULL;
+    tmp      = skb->dst;
+    skb->dst = skb->src;
+    skb->src = tmp;
+
+    // Send the reponse (an echo)
+    udp_wrap(skb);
 }
 
 #if 0

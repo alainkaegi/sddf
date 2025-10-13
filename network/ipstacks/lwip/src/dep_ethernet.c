@@ -57,6 +57,8 @@ void ethernet_dump(struct ethernet_header *hd) {
                ntoh16(hd->ethertype));
 }
 
+enum inet_status_codes lwip_eth_send(struct sk_buf *skb);
+
 enum inet_status_codes ethernet_wrap(struct sk_buf *skb) {
     // Measure the payload size in bytes.
     size_t size = skb->last - skb->first;
@@ -131,6 +133,7 @@ enum inet_status_codes ethernet_wrap(struct sk_buf *skb) {
     // Adjust the buffer to account for padding.
     skb->last = skb->last + padding;
 
+    lwip_eth_send(skb);
     return ETHERNET_GOOD;
 }
 
