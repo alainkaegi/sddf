@@ -166,7 +166,7 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
     skb->last  = skb->last - sizeof(struct ethernet_trailer);
 
     enum inet_status_codes status = ip_unwrap(skb);
-    if (status != IP_GOOD_UDP || status != IP_GOOD_ICMP)
+    if (status != IP_GOOD_UDP && status != IP_GOOD_ICMP)
         return status;
     return ETHERNET_GOOD;
 }
