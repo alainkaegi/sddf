@@ -49,7 +49,7 @@ static const uint16_t ETHERTYPE_IPV6 = 0x86dd;
 #endif
 
 void ethernet_dump(struct ethernet_header *hd) {
-   sddf_printf("ETH|ERROR: %02x:%02x:%02x:%02x:%02x:%02x > %02x:%02x:%02x:%02x:%02x:%02x (%04x)\n",
+   sddf_dprintf("VIP|ETH|INFO: %02x:%02x:%02x:%02x:%02x:%02x > %02x:%02x:%02x:%02x:%02x:%02x (%04x)\n",
                hd->src_addr[0], hd->src_addr[1], hd->src_addr[2],
                hd->src_addr[3], hd->src_addr[4], hd->src_addr[5],
                hd->dst_addr[0], hd->dst_addr[1], hd->dst_addr[2],
