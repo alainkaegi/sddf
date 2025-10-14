@@ -31,6 +31,8 @@
 #include "socket.h"
 #include "sk_buf.h"
 #include "dep_ethernet.h"
+#include "mac_addr.h"
+#include "ndp.h"
 
 // Reserve memory for our sk_bufs
 #define NUM_SK_BUFS 1024
@@ -39,6 +41,40 @@ struct socket src_sockets[NUM_SK_BUFS];
 struct socket dst_sockets[NUM_SK_BUFS];
 uint8_t sk_bufs_free_queue_memory_region[sizeof(struct dep_queue) + NUM_SK_BUFS * sizeof(struct sk_buf *)];
 struct dep_queue *sk_bufs_free_queue = (struct dep_queue *) sk_bufs_free_queue_memory_region;
+
+#define ODROIDC2B_IP \
+    {0xFD12, 0x3456, 0x789A, 0xBCDE, 0x0000, 0x0000, 0x0000, 0x0002}
+#define ODROIDC2B_MAC \
+    { 0xFE, 0xE5, 0x89, 0xB9, 0x7A, 0x9F }
+
+#define CS21_IP \
+    { 0xFD12, 0x3456, 0x789A, 0xBCDE, 0x0000, 0x0000, 0x0000, 0x0001 }
+#define CS21_MAC \
+    { 0xE8, 0x39, 0x35, 0x11, 0xCC, 0x15 }
+
+static neighbor_t odroidc2b_nbr = {
+    .addr      = ODROIDC2B_IP,
+    .link_addr = ODROIDC2B_MAC,
+    .state     = REACHABLE,
+    .is_router = 0,
+};
+
+static dest_map_t odroidc2b_map = {
+    .dst = ODROIDC2B_IP,
+    .nbr = ODROIDC2B_IP,
+};
+
+static neighbor_t cs21_nbr = {
+    .addr      = CS21_IP,
+    .link_addr = CS21_MAC,
+    .state     = REACHABLE,
+    .is_router = 0,
+};
+
+static dest_map_t cs21_map = {
+    .dst = CS21_IP,
+    .nbr = CS21_IP,
+};
 
 // Initializes sk_bufs
 void init_sk_bufs() {
@@ -545,8 +581,20 @@ void sddf_lwip_init(lib_sddf_lwip_config_t *lib_sddf_lwip_config, net_client_con
             lwip_state.err_output("LWIP|ERROR: failed to start DHCP negotiation\n");
         }
     }
+    // Initialize the free pool socket buffer descriptors
     dep_queue_init(sk_bufs_free_queue, NUM_SK_BUFS);
+
+    // Fills the free pool with usable socket buffer descriptors
     init_sk_bufs();
+
+    // Initialize neighbor discovery caches for IP to MAC resolution
+    ndp_init_caches();
+
+    // Now add preconfigured neighbor entries
+    ndp_dst_cache_add(&odroidc2b_map);
+    ndp_nbr_cache_add(&odroidc2b_nbr);
+    ndp_dst_cache_add(&cs21_map);
+    ndp_nbr_cache_add(&cs21_nbr);
 }
 
 void sddf_lwip_maybe_notify(void)
