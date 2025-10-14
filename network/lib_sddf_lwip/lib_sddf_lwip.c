@@ -321,6 +321,10 @@ static struct pbuf *create_interface_buffer(uint64_t offset, size_t length)
                                (void *)(offset + sddf_state.rx_buffer_data_region), NET_BUFFER_SIZE);
 }
 
+static err_t noop(struct netif *netif, struct pbuf *p) {
+    return ERR_OK;
+}
+
 /**
  * Copy a pbuf into an sddf buffer and insert it into the transmit active queue.
  * If client is RX only, and transmission is not intercepted, this function will
@@ -427,7 +431,7 @@ static err_t ethernet_init(struct netif *netif)
     netif->mtu = SDDF_LWIP_ETHER_MTU;
     netif->hwaddr_len = ETHARP_HWADDR_LEN;
     netif->output = etharp_output;
-    netif->linkoutput = lwip_eth_send;
+    netif->linkoutput = noop;
     netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP | NETIF_FLAG_IGMP;
 
     return ERR_OK;
