@@ -54,12 +54,12 @@ static inline void set_vtf(struct ip_header *hd,
 }
 
 void ip_dump(struct ip_header *hd) {
-    sddf_printf("IP|ERROR: %04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx\n",
+    sddf_dprintf("VIP|IP6|INFO: %04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx\n",
                 ntoh16(hd->src_addr[0]), ntoh16(hd->src_addr[1]),
                 ntoh16(hd->src_addr[2]), ntoh16(hd->src_addr[3]),
                 ntoh16(hd->src_addr[4]), ntoh16(hd->src_addr[5]),
                 ntoh16(hd->src_addr[6]), ntoh16(hd->src_addr[7]));
-    sddf_printf("IP|ERROR: > %04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx, length %hu, next %hx\n",
+    sddf_dprintf("VIP|IP6|INFO: > %04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx:%04hx, length %hu, next %hx\n",
                 ntoh16(hd->dst_addr[0]), ntoh16(hd->dst_addr[1]),
                 ntoh16(hd->dst_addr[2]), ntoh16(hd->dst_addr[3]),
                 ntoh16(hd->dst_addr[4]), ntoh16(hd->dst_addr[5]),

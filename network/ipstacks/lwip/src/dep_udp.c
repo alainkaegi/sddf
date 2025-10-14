@@ -33,7 +33,7 @@ struct udp_pseudo_header {
 void echo(struct sk_buf *skb);
 
 void udp_dump(struct udp_pseudo_header *hd) {
-  sddf_printf("UDP|ERROR: %hu > %hu, length %hu\n",
+  sddf_dprintf("VIP|UDP|INFO: %hu > %hu, length %hu\n",
               ntoh16(hd->udp_header.src_port), ntoh16(hd->udp_header.dst_port),
               ntoh16(hd->udp_header.length));
 }
