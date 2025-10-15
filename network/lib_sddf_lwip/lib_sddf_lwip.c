@@ -419,6 +419,9 @@ enum inet_status_codes lwip_eth_send(struct sk_buf *skb)
 
     sddf_state.notify_tx = true;
 
+    // Socket buffer descriptor is no longer in use
+    dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) skb);
+
     return ETHERNET_GOOD;
 }
 
