@@ -497,7 +497,8 @@ void sddf_lwip_process_rx(void)
             if (ethernet_unwrap(skb) != ETHERNET_GOOD) {
                 lwip_state.err_output("LWIP|ERROR: error ethernet unwrap\n");
                 // Return the buffer to the RX free queue
-                net_enqueue_free(&sddf_state.rx_queue, buffer);
+                err = net_enqueue_free(&sddf_state.rx_queue, buffer);
+                assert(!err);
                 // Socket buffer descriptor is no longer in use
                 dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) skb);
             }
