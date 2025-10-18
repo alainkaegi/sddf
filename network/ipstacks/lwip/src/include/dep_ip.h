@@ -26,8 +26,9 @@
  *
  * @param skb  A socket buffer with a UDP datagram
  * @param proto The IPv6 upper layer protocol number.
+ * @return a status code
  */
-void ip_wrap(struct sk_buf *skb, uint8_t proto);
+enum inet_status_codes ip_wrap(struct sk_buf *skb, uint8_t proto);
 
 /**
  * Process an incoming packet.
