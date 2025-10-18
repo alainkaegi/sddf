@@ -6,24 +6,21 @@
 // TBD
 // Brought from ethernet.h, ip.h
 enum inet_status_codes {
+    INET_GOOD,
     // Others
     QUEUE_EMPTY,
     // The Ethernet processing status codes.
-    ETHERNET_GOOD,     ///< All good
     ETHERNET_BAD_CRC,  ///< Bad CRC
     ETHERNET_BAD_LEN,  ///< Bad payload length
     ETHERNET_BAD_TYPE, ///< Not an IPv6 packet
     ETHERNET_NO_SRC,   ///< No neighbor entry for source
     ETHERNET_NO_DST,   ///< No neighbor entry for dest
     // The IP layer processing status codes.
-    IP_GOOD_UDP,       ///< The IP packet is valid, next header is UDP
-    IP_GOOD_ICMP,      ///< The IP packet is valid, next header is ICMP
     IP_BAD_LENGTH,     ///< The IP packet length is invalid
     IP_BAD_DST_ADDR,   ///< Unexpected destination IP address
     IP_BAD_VERSION,    ///< Unexpected IP version
     IP_BAD_NXT_HDR,    ///< Unexpected next header protocol
     // The UDP processing status codes.
-    UDP_GOOD,         ///< All good
     UDP_BAD_LENGTH,   ///< Length field disagrees with payload size
     UDP_BAD_CHECKSUM, ///< Bad checksum
     UDP_BAD_PORT,     ///< Unexpected destination port
