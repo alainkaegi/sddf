@@ -133,8 +133,7 @@ enum inet_status_codes ethernet_wrap(struct sk_buf *skb) {
     // Adjust the buffer to account for padding.
     skb->last = skb->last + padding;
 
-    lwip_eth_send(skb);
-    return ETHERNET_GOOD;
+    return lwip_eth_send(skb);
 }
 
 enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
@@ -154,6 +153,7 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
         return ETHERNET_BAD_LEN;
     }
 
+#if ETH_CHK_CRC == true
     // Compute CRC on received payload.
     uint32_t crc = crc32(skb->first, (void *) tl - (void *) hd);
 
@@ -161,12 +161,10 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
     if (crc != tl->crc) {
         return ETHERNET_BAD_CRC;
     }
+#endif
 
     skb->first = skb->first + sizeof(struct ethernet_header);
     skb->last  = skb->last - sizeof(struct ethernet_trailer);
 
-    enum inet_status_codes status = ip_unwrap(skb);
-    if (status != IP_GOOD_UDP && status != IP_GOOD_ICMP)
-        return status;
-    return ETHERNET_GOOD;
+    return ip_unwrap(skb);
 }

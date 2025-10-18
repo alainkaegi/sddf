@@ -458,10 +458,11 @@ enum inet_status_codes lwip_eth_send(struct sk_buf *skb)
     buffer.len = 0;
     err = net_enqueue_free(&sddf_state.rx_queue, buffer);
     assert(!err);
+    sddf_state.notify_rx = true;
     // Socket buffer descriptor is no longer in use
     dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) skb);
 
-    return ETHERNET_GOOD;
+    return INET_GOOD;
 }
 
 net_sddf_err_t sddf_lwip_transmit_pbuf(struct pbuf *p)
@@ -494,10 +495,12 @@ void sddf_lwip_process_rx(void)
             skb->end    = end;
             skb->last   = end;
             skb->err    = 0;
-            if (ethernet_unwrap(skb) != ETHERNET_GOOD) {
+            if (ethernet_unwrap(skb) != INET_GOOD) {
                 lwip_state.err_output("LWIP|ERROR: error ethernet unwrap\n");
                 // Return the buffer to the RX free queue
-                net_enqueue_free(&sddf_state.rx_queue, buffer);
+                err = net_enqueue_free(&sddf_state.rx_queue, buffer);
+                assert(!err);
+                sddf_state.notify_rx = true;
                 // Socket buffer descriptor is no longer in use
                 dep_queue_enqueue(sk_bufs_free_queue, (uint64_t) skb);
             }

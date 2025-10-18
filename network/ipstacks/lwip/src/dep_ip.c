@@ -68,7 +68,7 @@ void ip_dump(struct ip_header *hd) {
                 hd->next_header);
 }
 
-void ip_wrap(struct sk_buf *skb, uint8_t proto) {
+enum inet_status_codes ip_wrap(struct sk_buf *skb, uint8_t proto) {
     // There should be enough headroom to prepend the IP header.
     assert((skb->first - skb->begin) >= sizeof(struct ip_header));
 
@@ -90,8 +90,7 @@ void ip_wrap(struct sk_buf *skb, uint8_t proto) {
     // Adjust the buffer to account for the IP header.
     skb->first = skb->first - sizeof(struct ip_header);
 
-    enum inet_status_codes status = ethernet_wrap(skb);
-    assert(status == ETHERNET_GOOD);
+    return ethernet_wrap(skb);
 }
 
 enum inet_status_codes ip_unwrap(struct sk_buf *skb) {
@@ -128,13 +127,10 @@ enum inet_status_codes ip_unwrap(struct sk_buf *skb) {
     switch (hd->next_header) {
         case IP_PROTO_UDP:
         {
-            enum inet_status_codes status = udp_unwrap(skb);
-            if (status != UDP_GOOD)
-               return status;
-            return IP_GOOD_UDP;
+            return udp_unwrap(skb);
         }
         case IP_PROTO_ICMP6:
-            return IP_GOOD_ICMP;
+            return IP_BAD_NXT_HDR;
         default:
             return IP_BAD_NXT_HDR;
     }

@@ -25,8 +25,9 @@ size_t udp_send(void *buf,
  * Given a socket buffer seeded with a message add the UDP header.
  *
  * @param skb  A socket buffer with a (possibly empty) message
+ * @return a status code
  */
-void udp_wrap(struct sk_buf *skb);
+enum inet_status_codes udp_wrap(struct sk_buf *skb);
 
 /**
  * Process an incoming UDP datagram.

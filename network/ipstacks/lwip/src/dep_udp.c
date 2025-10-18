@@ -30,7 +30,7 @@ struct udp_pseudo_header {
     struct udp_header udp_header;
 };
 
-void echo(struct sk_buf *skb);
+enum inet_status_codes echo(struct sk_buf *skb);
 
 void udp_dump(struct udp_pseudo_header *hd) {
   sddf_dprintf("VIP|UDP|INFO: %hu > %hu, length %hu\n",
@@ -38,7 +38,7 @@ void udp_dump(struct udp_pseudo_header *hd) {
               ntoh16(hd->udp_header.length));
 }
 
-void udp_wrap(struct sk_buf *skb) {
+enum inet_status_codes udp_wrap(struct sk_buf *skb) {
     // There should be enough headroom to compute the UDP checksum.
     assert((skb->first - skb->begin) >= sizeof(struct udp_pseudo_header));
 
@@ -71,7 +71,7 @@ void udp_wrap(struct sk_buf *skb) {
     // pseudo header).
     skb->first = skb->first - sizeof(struct udp_header);
 
-    ip_wrap(skb, IP_PROTO_UDP);
+    return ip_wrap(skb, IP_PROTO_UDP);
 }
 
 enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
@@ -103,10 +103,12 @@ enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
         return UDP_BAD_LENGTH;
     }
 
+#if UDP_CHK_CRC == true
     // Verify the checksum.
     if (checksum(hd, sizeof(struct udp_pseudo_header) + size) != 0x0000) {
         return UDP_BAD_CHECKSUM;
     }
+#endif
 
     // Set ports
     skb->dst->port = ntoh16(hd->udp_header.dst_port);
@@ -115,20 +117,18 @@ enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
     // Fix the socket buffer.
     skb->first += sizeof(struct udp_header);
 
-    echo(skb);
-
-    return UDP_GOOD;
+    return echo(skb);
 }
 
-void echo(struct sk_buf *skb) {
+enum inet_status_codes echo(struct sk_buf *skb) {
     // Flip the sockets
     struct socket *tmp = NULL;
     tmp      = skb->dst;
     skb->dst = skb->src;
     skb->src = tmp;
 
-    // Send the reponse (an echo)
-    udp_wrap(skb);
+    // Send the response (an echo)
+    return udp_wrap(skb);
 }
 
 #if 0
