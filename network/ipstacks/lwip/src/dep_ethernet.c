@@ -153,6 +153,7 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
         return ETHERNET_BAD_LEN;
     }
 
+#if ETH_CHK_CRC == true
     // Compute CRC on received payload.
     uint32_t crc = crc32(skb->first, (void *) tl - (void *) hd);
 
@@ -160,6 +161,7 @@ enum inet_status_codes ethernet_unwrap(struct sk_buf *skb) {
     if (crc != tl->crc) {
         return ETHERNET_BAD_CRC;
     }
+#endif
 
     skb->first = skb->first + sizeof(struct ethernet_header);
     skb->last  = skb->last - sizeof(struct ethernet_trailer);

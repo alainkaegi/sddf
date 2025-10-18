@@ -103,10 +103,12 @@ enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
         return UDP_BAD_LENGTH;
     }
 
+#if UDP_CHK_CRC == true
     // Verify the checksum.
     if (checksum(hd, sizeof(struct udp_pseudo_header) + size) != 0x0000) {
         return UDP_BAD_CHECKSUM;
     }
+#endif
 
     // Set ports
     skb->dst->port = ntoh16(hd->udp_header.dst_port);
