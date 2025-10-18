@@ -127,7 +127,7 @@ enum inet_status_codes echo(struct sk_buf *skb) {
     skb->dst = skb->src;
     skb->src = tmp;
 
-    // Send the reponse (an echo)
+    // Send the response (an echo)
     return udp_wrap(skb);
 }
 
