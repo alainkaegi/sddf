@@ -75,7 +75,7 @@ enum inet_status_codes udp_wrap(struct sk_buf *skb) {
 }
 
 enum inet_status_codes udp_unwrap(struct sk_buf *skb) {
-#if UDP_CHK_CRC == true
+#if UDP_CHK_CHKSUM == true
     // There should be enough headroom to check the UDP checksum.
     assert((skb->first - skb->begin) >=
            (sizeof(struct udp_pseudo_header) - sizeof(struct udp_header)));
