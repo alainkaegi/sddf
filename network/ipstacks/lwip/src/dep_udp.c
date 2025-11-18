@@ -12,6 +12,8 @@
 
 #include <sddf/util/printf.h>
 
+#define UDP_ADD_CHKSUM true
+
 //#include "assert.h"
 
 struct udp_header {
@@ -39,12 +41,17 @@ void udp_dump(struct udp_pseudo_header *hd) {
 }
 
 enum inet_status_codes udp_wrap(struct sk_buf *skb) {
-    // There should be enough headroom to compute the UDP checksum.
+    // There should be enough headroom.
+#if UDP_ADD_CHKSUM == true
     assert((skb->first - skb->begin) >= sizeof(struct udp_pseudo_header));
+#else
+    assert((skb->first - skb->begin) >= sizeof(struct udp_header));
+#endif
 
     // Measure the payload size in bytes.
     size_t size = skb->last - skb->first;
 
+#if UDP_ADD_CHKSUM == true
     // Compute the address of the UDP pseudo header (which includes
     // the UDP header among other items).
     struct udp_pseudo_header *hd =
@@ -70,6 +77,14 @@ enum inet_status_codes udp_wrap(struct sk_buf *skb) {
     // Adjust the buffer to account for the UDP header (but not the
     // pseudo header).
     skb->first = skb->first - sizeof(struct udp_header);
+#else
+    // Compute the address of the UDP header.
+    struct udp_header *hd = skb->first - sizeof(struct udp_header);
+    hd->src_port = hton16(skb->src->port);
+    hd->dst_port = hton16(skb->dst->port);
+    hd->length   = hton16(size + sizeof(struct udp_header));
+    hd->checksum = 0;
+#endif
 
     return ip_wrap(skb, IP_PROTO_UDP);
 }
