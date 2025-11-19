@@ -12,7 +12,7 @@
 
 #include <sddf/util/printf.h>
 
-#define UDP_ADD_CHKSUM true
+#define UDP_ADD_CHKSUM false
 
 //#include "assert.h"
 
