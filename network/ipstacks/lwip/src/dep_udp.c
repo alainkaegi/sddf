@@ -73,10 +73,6 @@ enum inet_status_codes udp_wrap(struct sk_buf *skb) {
     // on a buffer already in that order.
     hd->udp_header.checksum =
         checksum(hd, size + sizeof(struct udp_pseudo_header));
-
-    // Adjust the buffer to account for the UDP header (but not the
-    // pseudo header).
-    skb->first = skb->first - sizeof(struct udp_header);
 #else
     // Compute the address of the UDP header.
     struct udp_header *hd = skb->first - sizeof(struct udp_header);
@@ -85,6 +81,10 @@ enum inet_status_codes udp_wrap(struct sk_buf *skb) {
     hd->length   = hton16(size + sizeof(struct udp_header));
     hd->checksum = 0;
 #endif
+
+    // Adjust the buffer to account for the UDP header (but not the
+    // pseudo header).
+    skb->first = skb->first - sizeof(struct udp_header);
 
     return ip_wrap(skb, IP_PROTO_UDP);
 }
