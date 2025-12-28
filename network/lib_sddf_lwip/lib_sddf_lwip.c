@@ -62,6 +62,16 @@ struct dep_queue *sk_bufs_free_queue = (struct dep_queue *) sk_bufs_free_queue_m
 #define DUCK02_MAC \
     { 0x00, 0x1E, 0x06, 0x45, 0x69, 0x96 }
 
+#define DUCK03_IP \
+    { 0xFD12, 0x3456, 0x789A, 0xBCDE, 0x0000, 0x0000, 0x0000, 0x0012 }
+#define DUCK03_MAC \
+    { 0x00, 0x1E, 0x06, 0x45, 0x70, 0xED }
+
+#define DUCK04_IP \
+    { 0xFD12, 0x3456, 0x789A, 0xBCDE, 0x0000, 0x0000, 0x0000, 0x0013 }
+#define DUCK04_MAC \
+    { 0x00, 0x1E, 0x06, 0x45, 0x69, 0xB9 }
+
 static neighbor_t odroidc2b_nbr = {
     .addr      = ODROIDC2B_IP,
     .link_addr = ODROIDC2B_MAC,
@@ -108,6 +118,30 @@ static neighbor_t duck02_nbr = {
 static dest_map_t duck02_map = {
     .dst = DUCK02_IP,
     .nbr = DUCK02_IP,
+};
+
+static neighbor_t duck03_nbr = {
+    .addr      = DUCK03_IP,
+    .link_addr = DUCK03_MAC,
+    .state     = REACHABLE,
+    .is_router = 0,
+};
+
+static dest_map_t duck03_map = {
+    .dst = DUCK03_IP,
+    .nbr = DUCK03_IP,
+};
+
+static neighbor_t duck04_nbr = {
+    .addr      = DUCK04_IP,
+    .link_addr = DUCK04_MAC,
+    .state     = REACHABLE,
+    .is_router = 0,
+};
+
+static dest_map_t duck04_map = {
+    .dst = DUCK04_IP,
+    .nbr = DUCK04_IP,
 };
 
 // Initializes sk_bufs
@@ -647,6 +681,10 @@ void sddf_lwip_init(lib_sddf_lwip_config_t *lib_sddf_lwip_config, net_client_con
     ndp_nbr_cache_add(&duck01_nbr);
     ndp_dst_cache_add(&duck02_map);
     ndp_nbr_cache_add(&duck02_nbr);
+    ndp_dst_cache_add(&duck03_map);
+    ndp_nbr_cache_add(&duck03_nbr);
+    ndp_dst_cache_add(&duck04_map);
+    ndp_nbr_cache_add(&duck04_nbr);
 }
 
 void sddf_lwip_maybe_notify(void)
